@@ -1,5 +1,5 @@
 [workspace]
 
 members = [
-    "rdf_database",
+    "sparql_server_client",
 ]

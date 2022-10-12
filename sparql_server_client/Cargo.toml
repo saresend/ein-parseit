@@ -1,5 +1,5 @@
 [package]
-name = "rdf_database"
+name = "sparql_server_client"
 version = "0.1.0"
 edition = "2021"
 
