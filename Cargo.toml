@@ -2,4 +2,5 @@
 
 members = [
     "sparql_server_client",
+    "tree_sitter_parser",
 ]
