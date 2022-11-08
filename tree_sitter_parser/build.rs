@@ -6,7 +6,7 @@ fn main() {
 
 
 fn build_language(language: &str) {
-    let dir: PathBuf = ["vendor",language, "src"].iter().collect();
+    let dir: PathBuf = ["vendor", language, "src"].iter().collect();
 
     cc::Build::new()
         .include(&dir)
