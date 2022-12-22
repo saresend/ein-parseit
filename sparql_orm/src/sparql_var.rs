@@ -8,11 +8,7 @@
 
 pub trait SPQLVar {}
 
-use crate::identifier::Ident;
-
-pub trait Identifier {
-    fn gen_identifier(&self) -> Ident;
-}
+use crate::identifier::*;
 
 pub struct Literal<T: Identifier> {
    v: T, 
