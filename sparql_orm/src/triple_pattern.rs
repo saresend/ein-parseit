@@ -70,9 +70,9 @@ type ConstTriple = TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>
 impl TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>> {
     pub fn new(sub: impl ToString, pred: impl ToString, obj: impl ToString) -> Self {
         Self {
-        subject: Literal::<Ident>::new(sub),
-        predicate: Literal::<Ident>::new(pred), 
-        object: Literal::<Ident>::new(obj), 
+            subject: Literal::<Ident>::new(sub),
+            predicate: Literal::<Ident>::new(pred),
+            object: Literal::<Ident>::new(obj),
         }
     }
 }
@@ -83,7 +83,7 @@ mod triple_pattern_tests {
     use crate::sparql_var::{Literal, Variable};
     use crate::{
         query_build::gen_fragment,
-        triple_pattern::{SPQLConstTriple,ConstTriple, TriplePattern},
+        triple_pattern::{ConstTriple, SPQLConstTriple, TriplePattern},
     };
     #[test]
     fn test_literal_triple() {

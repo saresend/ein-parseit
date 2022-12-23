@@ -44,23 +44,25 @@ where
     }
 }
 
-
 /*
- * Util Methods 
+ * Util Methods
  */
 use std::string::ToString;
 
 impl Literal<Ident> {
     pub fn new(name: impl ToString) -> Self {
-        Self { v : Ident(name.to_string()) }
+        Self {
+            v: Ident(name.to_string()),
+        }
     }
 }
 
 impl Variable<Ident> {
     pub fn new(name: impl ToString) -> Self {
-        Self { v : Ident(name.to_string()) }
+        Self {
+            v: Ident(name.to_string()),
+        }
     }
-
 }
 
 #[cfg(test)]
