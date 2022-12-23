@@ -11,7 +11,7 @@ pub trait SPQLVar {}
 use crate::identifier::*;
 
 pub struct Literal<T: Identifier> {
-   v: T, 
+    v: T,
 }
 pub struct Variable<T: Identifier> {
     v: T,

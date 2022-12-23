@@ -1,4 +1,3 @@
-
 //!
 //! Basic types to represent a single SPARQL Identifier
 //! i.e. `name`, or `foaf:author`,
@@ -15,4 +14,3 @@ impl Identifier for Ident {
         self.clone()
     }
 }
-
