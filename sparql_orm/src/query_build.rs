@@ -39,11 +39,6 @@ pub trait QueryFragment {
 pub trait SparqlQuery {}
 
 pub fn run_sparql_generation<T: SparqlQuery + QueryFragment>(obj: T) -> String {
-    // I don't want to expose
-    // a public interface to any function that allows
-    // folks to generate a non-complete sparql query,
-    // however since TraitSparqlQuery is a subtype of QueryFragment,
-    // we can just use this internally
     gen_fragment(obj)
 }
 

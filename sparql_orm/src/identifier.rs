@@ -4,7 +4,8 @@
 //!
 use crate::query_build::{QueryFragment, SparqlQuery};
 
-pub type Ident = String;
+#[derive(Clone)]
+pub struct Ident(pub(crate) String);
 
 pub trait Identifier {
     fn gen_identifier(&self) -> Ident;
@@ -17,22 +18,19 @@ impl Identifier for Ident {
 }
 use crate::query_build::QueryBuilder;
 
-impl<T> QueryFragment for T
-where
-    T: Identifier,
-{
+impl QueryFragment for Ident {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        builder.write_element(&self.gen_identifier());
+        builder.write_element(&self.gen_identifier().0);
     }
 }
 
 #[cfg(test)]
 mod ident_tests {
+    use super::Ident;
     use crate::query_build::gen_fragment;
-    use super::Ident; 
     #[test]
     fn test_ident_generation() {
-        let ident = String::from("test");
+        let ident: Ident = Ident(String::from("test"));
         let result = gen_fragment(ident);
         assert_eq!(result, "test");
     }
