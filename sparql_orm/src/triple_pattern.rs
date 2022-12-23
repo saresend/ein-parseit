@@ -28,7 +28,7 @@ where
 {
 }
 
-struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> {
+pub struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> {
     subject: Subject,
     predicate: Predicate,
     object: Object,
@@ -65,7 +65,7 @@ use crate::identifier::Ident;
 use crate::sparql_var::Literal;
 use std::string::ToString;
 
-type ConstTriple = TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>;
+pub type ConstTriple = TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>;
 
 impl TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>> {
     pub fn new(sub: impl ToString, pred: impl ToString, obj: impl ToString) -> Self {
@@ -119,5 +119,10 @@ mod triple_pattern_tests {
     #[test]
     fn assert_const_triple_impl() {
         test_const_trip::<TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>>();
+    }
+
+    #[test]
+    fn assert_type_alias_impl() {
+        test_const_trip::<ConstTriple>();
     }
 }

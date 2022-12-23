@@ -40,6 +40,13 @@ impl QueryFragment for DefaultGraphSpecifier {
     }
 }
 
+use std::string::ToString;
+impl GraphIdent {
+    pub fn new(s: impl ToString) -> Self {
+        Self(s.to_string())
+    }
+}
+
 #[cfg(test)]
 mod graph_spec_tests {
     use super::*;

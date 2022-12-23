@@ -2,7 +2,7 @@
 //! A module containing insert clause related functionality, traits
 //! and types
 
-use crate::graph_specifier::GraphSpecifier;
+use crate::graph_specifier::{GraphIdent, GraphSpecifier};
 use crate::identifier::*;
 use crate::query_build::{QueryBuilder, QueryFragment, SparqlQuery};
 use crate::triple_pattern::SPQLConstTriple;
@@ -15,29 +15,31 @@ use crate::triple_pattern::SPQLConstTriple;
 pub trait InsertableDataTripleSet {}
 pub struct EmptyTripleSet;
 
-pub struct InsertTripleSet<CT: SPQLConstTriple, RST: InsertableDataTripleSet> {
-    ct: CT,
-    rst: RST,
+pub struct InsertTripleSet<CT: SPQLConstTriple, const N: usize> {
+    elems: [CT; N],
 }
 
-impl<CT, RST> InsertableDataTripleSet for InsertTripleSet<CT, RST>
-where
-    CT: SPQLConstTriple,
-    RST: InsertableDataTripleSet,
-{
-}
+impl<CT, const N: usize> InsertableDataTripleSet for InsertTripleSet<CT, N> where CT: SPQLConstTriple
+{}
 
 impl InsertableDataTripleSet for EmptyTripleSet {}
 
-impl<CT, RST> QueryFragment for InsertTripleSet<CT, RST>
+//
+// A bit of a hack to represent an "empty" InsertTripleSet,
+// via having EmptyTripleSet as both it's members
+//
+//
+impl SPQLConstTriple for EmptyTripleSet {}
+
+impl<CT, const N: usize> QueryFragment for InsertTripleSet<CT, N>
 where
     CT: SPQLConstTriple + QueryFragment,
-    RST: InsertableDataTripleSet + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        self.ct.generate_fragment(builder);
-        builder.write_element(";\n");
-        self.rst.generate_fragment(builder);
+        for elem in &self.elems {
+            elem.generate_fragment(builder);
+            builder.write_element(";\n");
+        }
     }
 }
 
@@ -68,11 +70,33 @@ where
     SEL: InsertableDataTripleSet + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        builder.write_element("INSERT DATA {");
+        builder.write_element("INSERT DATA { ");
         self.graph_spec.generate_fragment(builder);
-        builder.write_element("{");
+        builder.write_element(" {\n");
         self.selector.generate_fragment(builder);
         builder.write_element("}}");
+    }
+}
+
+use crate::triple_pattern::ConstTriple;
+
+impl<const N: usize> InsertTripleSet<ConstTriple, N> {
+    pub fn new(elements: [ConstTriple; N]) -> Self {
+        Self { elems: elements }
+    }
+}
+
+pub type InsertDataStatement<const N: usize> =
+    InsertDataClause<GraphIdent, InsertTripleSet<ConstTriple, N>>;
+
+use std::string::ToString;
+
+impl<const N: usize> InsertDataClause<GraphIdent, InsertTripleSet<ConstTriple, N>> {
+    pub fn new(graph_name: impl ToString, elems: [ConstTriple; N]) -> Self {
+        Self {
+            graph_spec: GraphIdent::new(graph_name),
+            selector: InsertTripleSet::<ConstTriple, N>::new(elems),
+        }
     }
 }
 
@@ -82,5 +106,25 @@ mod insert_data_clause_tests {
     use crate::query_build::gen_fragment;
 
     #[test]
-    fn test_basic_insert_data() {}
+    fn test_basic_insert_data() {
+        let v = InsertDataStatement::<3>::new(
+            "test_graph",
+            [
+                ConstTriple::new("foo", "bar", "baz"),
+                ConstTriple::new("toast", "topping", "butter"),
+                ConstTriple::new("pancake", "topping", "syrup"),
+            ],
+        );
+
+        let result = gen_fragment(v);
+
+        assert_eq!(
+            result,
+            "INSERT DATA { GRAPH test_graph {
+foo bar baz;
+toast topping butter;
+pancake topping syrup;
+}}"
+        );
+    }
 }
