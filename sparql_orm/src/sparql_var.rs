@@ -13,10 +13,10 @@ pub trait SPQLVar {}
 use crate::identifier::*;
 
 pub struct Literal<T: Identifier> {
-    v: T,
+    pub(crate) v: T,
 }
 pub struct Variable<T: Identifier> {
-    v: T,
+    pub(crate) v: T,
 }
 
 impl<T> SPQLVar for Literal<T> where T: Identifier {}
@@ -40,5 +40,27 @@ where
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         builder.write_element("?");
         self.v.generate_fragment(builder);
+    }
+}
+
+
+#[cfg(test)]
+mod spql_var_tests {
+    use crate::sparql_var::{Literal, Variable};
+    use crate::query_build::gen_fragment;
+
+    
+    #[test]
+    fn test_literal_render() {
+        let lit = Literal { v : String::from("foo") };
+        let result = gen_fragment(lit); 
+        assert_eq!(result, "foo");
+    }
+
+    #[test]
+    fn test_var_render() {
+        let lit = Variable { v : String::from("foo") };
+        let result = gen_fragment(lit); 
+        assert_eq!(result, "?foo");
     }
 }

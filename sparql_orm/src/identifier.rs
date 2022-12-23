@@ -25,3 +25,15 @@ where
         builder.write_element(&self.gen_identifier());
     }
 }
+
+#[cfg(test)]
+mod ident_tests {
+    use crate::query_build::gen_fragment;
+    use super::Ident; 
+    #[test]
+    fn test_ident_generation() {
+        let ident = String::from("test");
+        let result = gen_fragment(ident);
+        assert_eq!(result, "test");
+    }
+}
