@@ -9,6 +9,7 @@
 use crate::query_build::QueryFragment;
 
 pub trait SPQLVar {}
+pub trait ConstVar {}
 
 use crate::identifier::*;
 
@@ -21,6 +22,9 @@ pub struct Variable<T: Identifier> {
 
 impl<T> SPQLVar for Literal<T> where T: Identifier {}
 impl<T> SPQLVar for Variable<T> where T: Identifier {}
+
+/// Implemented only for types representing non-variable bindings 
+impl<T> ConstVar for Literal<T> where T: Identifier {}
 
 use crate::query_build::QueryBuilder;
 

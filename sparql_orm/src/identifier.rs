@@ -2,7 +2,7 @@
 //! Basic types to represent a single SPARQL Identifier
 //! i.e. `name`, or `foaf:author`,
 //!
-use crate::query_build::{QueryFragment, SparqlQuery};
+use crate::query_build::QueryFragment;
 
 #[derive(Clone)]
 pub struct Ident(pub(crate) String);

@@ -8,8 +8,7 @@
 //! can then build like Triple<Var<Binding>, Literal<LiteralBinding>, Var<Object>
 
 use crate::query_build::QueryFragment;
-use crate::sparql_var::SPQLVar;
-use std::marker::PhantomData;
+use crate::sparql_var::{ConstVar, SPQLVar};
 
 /// This is a marker trait to denote types that represent any valid
 /// triple, or triple pattern
@@ -18,7 +17,11 @@ pub trait SPQLTriple {}
 /// A marker for types that represent a triple with no variable bindings
 pub trait SPQLConstTriple {}
 
-impl<T: SPQLConstTriple> SPQLTriple for T {}
+
+///
+/// This implements 'ConstTriple' for all Triples that only contain
+/// Constants / Literals in them
+impl<SU, PR, OBJ> SPQLConstTriple for TriplePattern<SU, PR, OBJ> where SU: ConstVar + SPQLVar, PR: ConstVar + SPQLVar, OBJ: ConstVar + SPQLVar {}
 
 struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> {
     subject: Subject,
@@ -53,9 +56,9 @@ where
 
 #[cfg(test)]
 mod triple_pattern_tests {
-    use crate::identifier::Ident;
     use crate::sparql_var::{Literal, Variable};
-    use crate::{query_build::gen_fragment, triple_pattern::TriplePattern};
+    use crate::{query_build::gen_fragment, triple_pattern::{SPQLConstTriple, TriplePattern}};
+    use crate::identifier::Ident;
     #[test]
     fn test_literal_triple() {
         let triple = TriplePattern {
@@ -89,5 +92,13 @@ mod triple_pattern_tests {
 
         let result = gen_fragment(triple);
         assert_eq!(result, "foo ?bar ?baz");
+    }
+
+    fn test_const_trip<T>() where T: SPQLConstTriple {}
+
+    #[test]
+    fn assert_const_triple_impl() {
+        test_const_trip::<TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>>(); 
+
     }
 }
