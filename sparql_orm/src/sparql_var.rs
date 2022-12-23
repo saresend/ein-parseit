@@ -3,7 +3,7 @@
 //!
 //!
 //! A marker trait that indicates that a type is a valid
-//! variable, that is useable in a triple or any other
+//! variable, that is usable in a triple or any other
 //! place where a valid variable or binding can be used
 
 pub trait SPQLVar {}

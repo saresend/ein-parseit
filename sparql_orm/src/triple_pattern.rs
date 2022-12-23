@@ -14,6 +14,11 @@ use std::marker::PhantomData;
 /// triple, or triple pattern
 pub trait SPQLTriple {}
 
+/// A marker for types that represent a triple with no variable bindings 
+pub trait SPQLConstTriple {}
+
+impl<T: SPQLConstTriple> SPQLTriple for T {}
+
 struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> {
     subject  : PhantomData<Subject>,
     predicate : PhantomData<Predicate>,
