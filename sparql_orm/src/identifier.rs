@@ -18,8 +18,7 @@ impl Identifier for Ident {
 }
 use crate::query_build::QueryBuilder;
 
-impl QueryFragment for Ident
-{
+impl QueryFragment for Ident {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         builder.write_element(&self.gen_identifier().0);
     }
@@ -27,8 +26,8 @@ impl QueryFragment for Ident
 
 #[cfg(test)]
 mod ident_tests {
+    use super::Ident;
     use crate::query_build::gen_fragment;
-    use super::Ident; 
     #[test]
     fn test_ident_generation() {
         let ident: Ident = Ident(String::from("test"));

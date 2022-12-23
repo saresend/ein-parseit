@@ -53,9 +53,9 @@ where
 
 #[cfg(test)]
 mod triple_pattern_tests {
+    use crate::identifier::Ident;
     use crate::sparql_var::{Literal, Variable};
     use crate::{query_build::gen_fragment, triple_pattern::TriplePattern};
-    use crate::identifier::Ident;
     #[test]
     fn test_literal_triple() {
         let triple = TriplePattern {

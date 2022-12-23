@@ -12,7 +12,7 @@ pub trait GraphSpecifier {
 }
 
 impl GraphSpecifier for GraphIdent {
-    //TODO - Improve lifetime handling here 
+    //TODO - Improve lifetime handling here
     fn gen_specifier(&self) -> GraphIdent {
         self.clone()
     }
@@ -24,19 +24,30 @@ impl QueryFragment for GraphIdent {
         builder.write_element("GRAPH");
         builder.write_element(" ");
         builder.write_element(&self.gen_specifier().0);
-    }    
+    }
 }
 
+///
+/// A type to mark essentially that we want to leave the graph unspecified and instead use the
+/// default graph
+pub struct DefaultGraphSpecifier;
+
+impl QueryFragment for DefaultGraphSpecifier {
+    fn generate_fragment(&self, builder: &mut QueryBuilder) {
+        // TODO: evaluate whether defaulting to using
+        // a default graph called "default" makes sense as a behavior?
+        builder.write_element("GRAPH default");
+    }
+}
 
 #[cfg(test)]
 mod graph_spec_tests {
-    use crate::query_build::gen_fragment;
     use super::*;
+    use crate::query_build::gen_fragment;
     #[test]
     fn test_graph_specifier() {
         let specifier = GraphIdent(String::from("test"));
         let result = gen_fragment(specifier);
         assert_eq!(result, "GRAPH test");
     }
-
 }

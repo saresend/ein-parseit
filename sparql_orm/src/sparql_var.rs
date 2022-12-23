@@ -43,24 +43,27 @@ where
     }
 }
 
-
 #[cfg(test)]
 mod spql_var_tests {
-    use crate::sparql_var::{Literal, Variable};
-    use crate::query_build::gen_fragment;
     use crate::identifier::Ident;
-    
+    use crate::query_build::gen_fragment;
+    use crate::sparql_var::{Literal, Variable};
+
     #[test]
     fn test_literal_render() {
-        let lit = Literal { v : Ident(String::from("foo")) };
-        let result = gen_fragment(lit); 
+        let lit = Literal {
+            v: Ident(String::from("foo")),
+        };
+        let result = gen_fragment(lit);
         assert_eq!(result, "foo");
     }
 
     #[test]
     fn test_var_render() {
-        let lit = Variable { v : Ident(String::from("foo")) };
-        let result = gen_fragment(lit); 
+        let lit = Variable {
+            v: Ident(String::from("foo")),
+        };
+        let result = gen_fragment(lit);
         assert_eq!(result, "?foo");
     }
 }
