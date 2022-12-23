@@ -5,6 +5,7 @@
 use std::marker::PhantomData;
 use crate::identifier::*;
 use crate::triple_pattern::SPQLConstTriple;
+use crate::graph_specifier::GraphSpecifier;
 
 /// A marker trait for types that can be evaluated as part of 
 /// a InsertDataClause. Not that this explicitly will not 
@@ -13,8 +14,6 @@ use crate::triple_pattern::SPQLConstTriple;
 ///
 pub trait InsertableDataTripleSet {}
 
-/// A trait that marks any type that can represent a graph specifier
-pub trait GraphSpecifier {}
 
 pub struct EmptyTripleSet;
 
