@@ -2,11 +2,10 @@
 //! A module containing insert clause related functionality, traits
 //! and types
 
-use crate::graph_specifier::{DefaultGraphSpecifier, GraphSpecifier};
+use crate::graph_specifier::GraphSpecifier;
 use crate::identifier::*;
 use crate::query_build::{QueryBuilder, QueryFragment, SparqlQuery};
 use crate::triple_pattern::SPQLConstTriple;
-use std::marker::PhantomData;
 
 /// A marker trait for types that can be evaluated as part of
 /// a InsertDataClause. Not that this explicitly will not
@@ -75,4 +74,13 @@ where
         self.selector.generate_fragment(builder);
         builder.write_element("}}");
     }
+}
+
+#[cfg(test)]
+mod insert_data_clause_tests {
+    use super::*;
+    use crate::query_build::gen_fragment;
+
+    #[test]
+    fn test_basic_insert_data() {}
 }
