@@ -26,7 +26,7 @@ use crate::query_build::QueryBuilder;
 
 impl<T> QueryFragment for Literal<T>
 where
-    T: Identifier,
+    T: Identifier + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         self.v.generate_fragment(builder);
@@ -35,7 +35,7 @@ where
 
 impl<T> QueryFragment for Variable<T>
 where
-    T: Identifier,
+    T: Identifier + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         builder.write_element("?");
@@ -48,18 +48,18 @@ where
 mod spql_var_tests {
     use crate::sparql_var::{Literal, Variable};
     use crate::query_build::gen_fragment;
-
+    use crate::identifier::Ident;
     
     #[test]
     fn test_literal_render() {
-        let lit = Literal { v : String::from("foo") };
+        let lit = Literal { v : Ident(String::from("foo")) };
         let result = gen_fragment(lit); 
         assert_eq!(result, "foo");
     }
 
     #[test]
     fn test_var_render() {
-        let lit = Variable { v : String::from("foo") };
+        let lit = Variable { v : Ident(String::from("foo")) };
         let result = gen_fragment(lit); 
         assert_eq!(result, "?foo");
     }

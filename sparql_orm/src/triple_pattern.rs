@@ -55,17 +55,18 @@ where
 mod triple_pattern_tests {
     use crate::sparql_var::{Literal, Variable};
     use crate::{query_build::gen_fragment, triple_pattern::TriplePattern};
+    use crate::identifier::Ident;
     #[test]
     fn test_literal_triple() {
         let triple = TriplePattern {
             subject: Literal {
-                v: String::from("foo"),
+                v: Ident(String::from("foo")),
             },
             predicate: Literal {
-                v: String::from("bar"),
+                v: Ident(String::from("bar")),
             },
             object: Literal {
-                v: String::from("baz"),
+                v: Ident(String::from("baz")),
             },
         };
         let result = gen_fragment(triple);
@@ -76,13 +77,13 @@ mod triple_pattern_tests {
     fn test_var_triple() {
         let triple = TriplePattern {
             subject: Literal {
-                v: String::from("foo"),
+                v: Ident(String::from("foo")),
             },
             predicate: Variable {
-                v: String::from("bar"),
+                v: Ident(String::from("bar")),
             },
             object: Variable {
-                v: String::from("baz"),
+                v: Ident(String::from("baz")),
             },
         };
 
