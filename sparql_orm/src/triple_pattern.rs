@@ -7,8 +7,8 @@
 //! pub type Triple<Subject, Predicate, Object>, that we
 //! can then build like Triple<Var<Binding>, Literal<LiteralBinding>, Var<Object>
 
-use crate::sparql_var::SPQLVar;
 use crate::query_build::QueryFragment;
+use crate::sparql_var::SPQLVar;
 use std::marker::PhantomData;
 
 /// This is a marker trait to denote types that represent any valid
@@ -37,7 +37,7 @@ where
 use crate::query_build::QueryBuilder;
 
 impl<SU, PR, OBJ> QueryFragment for TriplePattern<SU, PR, OBJ>
-where 
+where
     SU: SPQLVar + QueryFragment,
     PR: SPQLVar + QueryFragment,
     OBJ: SPQLVar + QueryFragment,
@@ -48,5 +48,45 @@ where
         self.predicate.generate_fragment(builder);
         builder.write_element(" ");
         self.object.generate_fragment(builder);
-    }    
+    }
+}
+
+#[cfg(test)]
+mod triple_pattern_tests {
+    use crate::sparql_var::{Literal, Variable};
+    use crate::{query_build::gen_fragment, triple_pattern::TriplePattern};
+    #[test]
+    fn test_literal_triple() {
+        let triple = TriplePattern {
+            subject: Literal {
+                v: String::from("foo"),
+            },
+            predicate: Literal {
+                v: String::from("bar"),
+            },
+            object: Literal {
+                v: String::from("baz"),
+            },
+        };
+        let result = gen_fragment(triple);
+        assert_eq!(result, "foo bar baz");
+    }
+
+    #[test]
+    fn test_var_triple() {
+        let triple = TriplePattern {
+            subject: Literal {
+                v: String::from("foo"),
+            },
+            predicate: Variable {
+                v: String::from("bar"),
+            },
+            object: Variable {
+                v: String::from("baz"),
+            },
+        };
+
+        let result = gen_fragment(triple);
+        assert_eq!(result, "foo ?bar ?baz");
+    }
 }

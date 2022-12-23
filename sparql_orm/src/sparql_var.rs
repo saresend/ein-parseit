@@ -13,10 +13,10 @@ pub trait SPQLVar {}
 use crate::identifier::*;
 
 pub struct Literal<T: Identifier> {
-    v: T,
+    pub(crate) v: T,
 }
 pub struct Variable<T: Identifier> {
-    v: T,
+    pub(crate) v: T,
 }
 
 impl<T> SPQLVar for Literal<T> where T: Identifier {}
