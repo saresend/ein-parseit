@@ -7,7 +7,7 @@
 //! pub type Triple<Subject, Predicate, Object>, that we
 //! can then build like Triple<Var<Binding>, Literal<LiteralBinding>, Var<Object>
 
-use crate::query_build::QueryFragment;
+use crate::query_build::{QueryBuilder, QueryFragment};
 use crate::sparql_var::{ConstVar, SPQLVar};
 
 /// This is a marker trait to denote types that represent any valid
@@ -17,11 +17,16 @@ pub trait SPQLTriple {}
 /// A marker for types that represent a triple with no variable bindings
 pub trait SPQLConstTriple {}
 
-
 ///
 /// This implements 'ConstTriple' for all Triples that only contain
 /// Constants / Literals in them
-impl<SU, PR, OBJ> SPQLConstTriple for TriplePattern<SU, PR, OBJ> where SU: ConstVar + SPQLVar, PR: ConstVar + SPQLVar, OBJ: ConstVar + SPQLVar {}
+impl<SU, PR, OBJ> SPQLConstTriple for TriplePattern<SU, PR, OBJ>
+where
+    SU: ConstVar + SPQLVar,
+    PR: ConstVar + SPQLVar,
+    OBJ: ConstVar + SPQLVar,
+{
+}
 
 struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> {
     subject: Subject,
@@ -36,8 +41,6 @@ where
     OBJ: SPQLVar,
 {
 }
-
-use crate::query_build::QueryBuilder;
 
 impl<SU, PR, OBJ> QueryFragment for TriplePattern<SU, PR, OBJ>
 where
@@ -54,24 +57,37 @@ where
     }
 }
 
+/*
+ * Util Methods
+ */
+
+use crate::identifier::Ident;
+use crate::sparql_var::Literal;
+use std::string::ToString;
+
+type ConstTriple = TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>;
+
+impl TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>> {
+    pub fn new(sub: impl ToString, pred: impl ToString, obj: impl ToString) -> Self {
+        Self {
+        subject: Literal::<Ident>::new(sub),
+        predicate: Literal::<Ident>::new(pred), 
+        object: Literal::<Ident>::new(obj), 
+        }
+    }
+}
+
 #[cfg(test)]
 mod triple_pattern_tests {
-    use crate::sparql_var::{Literal, Variable};
-    use crate::{query_build::gen_fragment, triple_pattern::{SPQLConstTriple, TriplePattern}};
     use crate::identifier::Ident;
+    use crate::sparql_var::{Literal, Variable};
+    use crate::{
+        query_build::gen_fragment,
+        triple_pattern::{SPQLConstTriple,ConstTriple, TriplePattern},
+    };
     #[test]
     fn test_literal_triple() {
-        let triple = TriplePattern {
-            subject: Literal {
-                v: Ident(String::from("foo")),
-            },
-            predicate: Literal {
-                v: Ident(String::from("bar")),
-            },
-            object: Literal {
-                v: Ident(String::from("baz")),
-            },
-        };
+        let triple = ConstTriple::new("foo", "bar", "baz");
         let result = gen_fragment(triple);
         assert_eq!(result, "foo bar baz");
     }
@@ -94,11 +110,14 @@ mod triple_pattern_tests {
         assert_eq!(result, "foo ?bar ?baz");
     }
 
-    fn test_const_trip<T>() where T: SPQLConstTriple {}
+    fn test_const_trip<T>()
+    where
+        T: SPQLConstTriple,
+    {
+    }
 
     #[test]
     fn assert_const_triple_impl() {
-        test_const_trip::<TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>>(); 
-
+        test_const_trip::<TriplePattern<Literal<Ident>, Literal<Ident>, Literal<Ident>>>();
     }
 }

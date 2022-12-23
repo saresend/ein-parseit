@@ -20,18 +20,20 @@ pub struct InsertTripleSet<CT: SPQLConstTriple, RST: InsertableDataTripleSet> {
     rst: RST,
 }
 
-impl<CT, RST> InsertableDataTripleSet for InsertTripleSet<CT, RST> where
+impl<CT, RST> InsertableDataTripleSet for InsertTripleSet<CT, RST>
+where
     CT: SPQLConstTriple,
-    RST: InsertableDataTripleSet
-{}
+    RST: InsertableDataTripleSet,
+{
+}
 
 impl InsertableDataTripleSet for EmptyTripleSet {}
 
-impl<CT, RST> QueryFragment for InsertTripleSet<CT, RST> where
-CT: SPQLConstTriple + QueryFragment,
-RST: InsertableDataTripleSet + QueryFragment,
+impl<CT, RST> QueryFragment for InsertTripleSet<CT, RST>
+where
+    CT: SPQLConstTriple + QueryFragment,
+    RST: InsertableDataTripleSet + QueryFragment,
 {
-    
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         self.ct.generate_fragment(builder);
         builder.write_element(";\n");
@@ -60,29 +62,25 @@ where
 {
 }
 
-impl<G, SEL> QueryFragment for InsertDataClause<G, SEL> where
-G: GraphSpecifier + QueryFragment,
-SEL: InsertableDataTripleSet + QueryFragment {
+impl<G, SEL> QueryFragment for InsertDataClause<G, SEL>
+where
+    G: GraphSpecifier + QueryFragment,
+    SEL: InsertableDataTripleSet + QueryFragment,
+{
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        builder.write_element("INSERT DATA {"); 
+        builder.write_element("INSERT DATA {");
         self.graph_spec.generate_fragment(builder);
         builder.write_element("{");
         self.selector.generate_fragment(builder);
         builder.write_element("}}");
     }
-
 }
-
-
 
 #[cfg(test)]
 mod insert_data_clause_tests {
     use super::*;
     use crate::query_build::gen_fragment;
 
-    
     #[test]
-    fn test_basic_insert_data() {
-        
-    }
+    fn test_basic_insert_data() {}
 }

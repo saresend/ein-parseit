@@ -1,7 +1,4 @@
 //!
-//! WIP, ideal end state is to have
-//!
-//!
 //! A marker trait that indicates that a type is a valid
 //! variable, that is usable in a triple or any other
 //! place where a valid variable or binding can be used
@@ -23,7 +20,7 @@ pub struct Variable<T: Identifier> {
 impl<T> SPQLVar for Literal<T> where T: Identifier {}
 impl<T> SPQLVar for Variable<T> where T: Identifier {}
 
-/// Implemented only for types representing non-variable bindings 
+/// Implemented only for types representing non-variable bindings
 impl<T> ConstVar for Literal<T> where T: Identifier {}
 
 use crate::query_build::QueryBuilder;
@@ -45,6 +42,25 @@ where
         builder.write_element("?");
         self.v.generate_fragment(builder);
     }
+}
+
+
+/*
+ * Util Methods 
+ */
+use std::string::ToString;
+
+impl Literal<Ident> {
+    pub fn new(name: impl ToString) -> Self {
+        Self { v : Ident(name.to_string()) }
+    }
+}
+
+impl Variable<Ident> {
+    pub fn new(name: impl ToString) -> Self {
+        Self { v : Ident(name.to_string()) }
+    }
+
 }
 
 #[cfg(test)]
