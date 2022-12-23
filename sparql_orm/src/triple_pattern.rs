@@ -8,6 +8,7 @@
 //! can then build like Triple<Var<Binding>, Literal<LiteralBinding>, Var<Object>
 
 use crate::sparql_var::SPQLVar;
+use crate::query_build::QueryFragment;
 use std::marker::PhantomData;
 
 /// This is a marker trait to denote types that represent any valid
@@ -20,9 +21,9 @@ pub trait SPQLConstTriple {}
 impl<T: SPQLConstTriple> SPQLTriple for T {}
 
 struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> {
-    subject: PhantomData<Subject>,
-    predicate: PhantomData<Predicate>,
-    object: PhantomData<Object>,
+    subject: Subject,
+    predicate: Predicate,
+    object: Object,
 }
 
 impl<SU, PR, OBJ> SPQLTriple for TriplePattern<SU, PR, OBJ>
@@ -31,4 +32,21 @@ where
     PR: SPQLVar,
     OBJ: SPQLVar,
 {
+}
+
+use crate::query_build::QueryBuilder;
+
+impl<SU, PR, OBJ> QueryFragment for TriplePattern<SU, PR, OBJ>
+where 
+    SU: SPQLVar + QueryFragment,
+    PR: SPQLVar + QueryFragment,
+    OBJ: SPQLVar + QueryFragment,
+{
+    fn generate_fragment(&self, builder: &mut QueryBuilder) {
+        self.subject.generate_fragment(builder);
+        builder.write_element(" ");
+        self.predicate.generate_fragment(builder);
+        builder.write_element(" ");
+        self.object.generate_fragment(builder);
+    }    
 }
