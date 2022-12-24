@@ -13,39 +13,18 @@ use crate::triple_pattern::SPQLConstTriple;
 /// as those are not supported by INSERT DATA
 ///
 pub trait InsertableDataTripleSet {}
-pub struct EmptyTripleSet;
 
-pub struct InsertTripleSet<CT: SPQLConstTriple, const N: usize> {
-    elems: [CT; N],
-}
+impl<CT, const N: usize> InsertableDataTripleSet for [CT; N] where CT: SPQLConstTriple {}
 
-impl<CT, const N: usize> InsertableDataTripleSet for InsertTripleSet<CT, N> where CT: SPQLConstTriple
-{}
-
-impl InsertableDataTripleSet for EmptyTripleSet {}
-
-//
-// A bit of a hack to represent an "empty" InsertTripleSet,
-// via having EmptyTripleSet as both it's members
-//
-//
-impl SPQLConstTriple for EmptyTripleSet {}
-
-impl<CT, const N: usize> QueryFragment for InsertTripleSet<CT, N>
+impl<CT, const N: usize> QueryFragment for [CT; N]
 where
     CT: SPQLConstTriple + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        for elem in &self.elems {
+        for elem in self.iter() {
             elem.generate_fragment(builder);
             builder.write_element(";\n");
         }
-    }
-}
-
-impl QueryFragment for EmptyTripleSet {
-    fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        // no - op
     }
 }
 
@@ -80,22 +59,15 @@ where
 
 use crate::triple_pattern::ConstTriple;
 
-impl<const N: usize> InsertTripleSet<ConstTriple, N> {
-    pub fn new(elements: [ConstTriple; N]) -> Self {
-        Self { elems: elements }
-    }
-}
-
-pub type InsertDataStatement<const N: usize> =
-    InsertDataClause<GraphIdent, InsertTripleSet<ConstTriple, N>>;
+pub type InsertDataStatement<const N: usize> = InsertDataClause<GraphIdent, [ConstTriple; N]>;
 
 use std::string::ToString;
 
-impl<const N: usize> InsertDataClause<GraphIdent, InsertTripleSet<ConstTriple, N>> {
+impl<const N: usize> InsertDataClause<GraphIdent, [ConstTriple; N]> {
     pub fn new(graph_name: impl ToString, elems: [ConstTriple; N]) -> Self {
         Self {
             graph_spec: GraphIdent::new(graph_name),
-            selector: InsertTripleSet::<ConstTriple, N>::new(elems),
+            selector: elems,
         }
     }
 }
