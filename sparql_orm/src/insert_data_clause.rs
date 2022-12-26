@@ -18,7 +18,7 @@ impl<CT, const N: usize> InsertableDataTripleSet for [CT; N] where CT: SPQLConst
 
 impl<CT, const N: usize> QueryFragment for [CT; N]
 where
-    CT: SPQLConstTriple + QueryFragment,
+    CT: QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         for elem in self.iter() {
