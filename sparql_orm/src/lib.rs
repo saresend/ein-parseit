@@ -12,3 +12,4 @@ pub mod query_build;
 pub mod sparql_var;
 pub mod triple_pattern;
 pub mod where_clause;
+pub mod insert_statement;
