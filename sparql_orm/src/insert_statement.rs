@@ -37,7 +37,7 @@ WHERE: QueryFragment + WhereClauseTrait {
         self.where_clause.generate_fragment(builder);
     }
 }
-
+ 
 pub struct InsertSelection {
     elems: Vec<Box<dyn SPQLTriple>>, 
 }
@@ -45,7 +45,9 @@ pub struct InsertSelection {
 impl InsertSelectionTrait for InsertSelection {}
 impl QueryFragment for InsertSelection {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
-        todo!()
+        for elem in &self.elems {
+            elem.generate_fragment(builder); 
+            builder.write_element(" .\n");
+        }
     }
 }
-

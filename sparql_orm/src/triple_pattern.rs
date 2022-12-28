@@ -12,7 +12,7 @@ use crate::sparql_var::{ConstVar, SPQLVar};
 
 /// This is a marker trait to denote types that represent any valid
 /// triple, or triple pattern
-pub trait SPQLTriple {}
+pub trait SPQLTriple: QueryFragment {}
 
 /// A marker for types that represent a triple with no variable bindings
 pub trait SPQLConstTriple {}
@@ -36,9 +36,9 @@ pub struct TriplePattern<Subject: SPQLVar, Predicate: SPQLVar, Object: SPQLVar> 
 
 impl<SU, PR, OBJ> SPQLTriple for TriplePattern<SU, PR, OBJ>
 where
-    SU: SPQLVar,
-    PR: SPQLVar,
-    OBJ: SPQLVar,
+    SU: SPQLVar + QueryFragment,
+    PR: SPQLVar + QueryFragment,
+    OBJ: SPQLVar + QueryFragment,
 {
 }
 
