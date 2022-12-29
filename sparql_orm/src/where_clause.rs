@@ -12,7 +12,11 @@ pub struct WhereClause<G: GraphSpecifier, PRED: PredicateSet> {
 }
 
 impl<G, PRED> WhereClauseTrait for WhereClause<G, PRED>
-where G: GraphSpecifier, PRED: PredicateSet {}
+where
+    G: GraphSpecifier,
+    PRED: PredicateSet,
+{
+}
 
 impl<G, PRED> QueryFragment for WhereClause<G, PRED>
 where
