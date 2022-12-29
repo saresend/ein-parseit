@@ -7,9 +7,12 @@ use crate::query_build::{QueryBuilder, QueryFragment};
 pub trait WhereClauseTrait {}
 
 pub struct WhereClause<G: GraphSpecifier, PRED: PredicateSet> {
-    graph: G,
-    predicates: PRED,
+    pub(crate) graph: G,
+    pub(crate) predicates: PRED,
 }
+
+impl<G, PRED> WhereClauseTrait for WhereClause<G, PRED>
+where G: GraphSpecifier, PRED: PredicateSet {}
 
 impl<G, PRED> QueryFragment for WhereClause<G, PRED>
 where
