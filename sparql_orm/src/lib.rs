@@ -5,13 +5,13 @@
 
 pub mod delete_data_clause;
 pub mod delete_statement;
-pub mod graph_specifier;
-pub mod identifier;
+mod graph_specifier;
+mod identifier;
 pub mod insert_data_clause;
 pub mod insert_statement;
-pub mod predicates;
+mod predicates;
 pub mod query_build;
-pub mod sparql_var;
-pub mod triple_pattern;
-pub mod update_types;
-pub mod where_clause;
+mod sparql_var;
+mod triple_pattern;
+mod update_types;
+mod where_clause;
