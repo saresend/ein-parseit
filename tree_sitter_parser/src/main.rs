@@ -1,32 +1,30 @@
-use tree_sitter::{Language, TreeCursor};
 use clap;
 use std::fs;
+use tree_sitter::{Language, TreeCursor};
 
 /*
- * Key initialization code for extern based c language for tree sitter. 
+ * Key initialization code for extern based c language for tree sitter.
  */
 
 #[link(name = "tree-sitter-rust")]
-extern "C" { fn tree_sitter_rust() -> Language; }
-
-
+extern "C" {
+    fn tree_sitter_rust() -> Language;
+}
 
 pub fn invoke_tree_sitter<'a>(input_file: &'a std::path::PathBuf) {
-
     let mut parser = tree_sitter::Parser::new();
     let language = unsafe { tree_sitter_rust() };
     parser.set_language(language).unwrap();
-    
+
     let source_code = fs::read_to_string(input_file).unwrap();
 
     let base_tree = parser.parse(source_code, None).unwrap();
     let base_tree = base_tree.walk();
 
     print_serialized_parse_tree(0, &base_tree);
-    }
+}
 
-
-/// Baseline for basic debugging and grokking the resulting parse tree of 
+/// Baseline for basic debugging and grokking the resulting parse tree of
 /// different files for rust
 ///
 /// as an example, when run against `examples/test.rs`
@@ -61,7 +59,6 @@ fn print_serialized_parse_tree<'a>(offset: usize, current_cursor: &'a TreeCursor
     while next.goto_next_sibling() {
         print_serialized_parse_tree(offset + 2, &mut next);
     }
-
 }
 
 #[derive(clap::Parser)]
@@ -73,13 +70,11 @@ struct Parseit {
 }
 use clap::Parser;
 fn invoke_clap_cli() -> Parseit {
-    Parseit::parse()    
+    Parseit::parse()
 }
-
-
 
 fn main() {
     let cli_input = invoke_clap_cli();
     let input_file = cli_input.file;
-    invoke_tree_sitter(&input_file);    
+    invoke_tree_sitter(&input_file);
 }

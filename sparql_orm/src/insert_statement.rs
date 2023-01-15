@@ -39,9 +39,7 @@ where
     }
 }
 
-pub type Insert =
-    InsertStatement<GraphIdent, UpdateSelection, UpdateWhereClause>;
-
+pub type Insert = InsertStatement<GraphIdent, UpdateSelection, UpdateWhereClause>;
 
 impl UpdateWhereClause {
     pub fn new(graph: impl std::string::ToString, predicates: WherePredicateSet) -> Self {

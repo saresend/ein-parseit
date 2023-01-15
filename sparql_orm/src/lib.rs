@@ -2,7 +2,8 @@
 //! This library is a diesel inspired flavor, of a possible ORM for
 //! sparql based queries. It implements a subset
 //! of the w3c specification for both query and update calls
-
+//!
+#![feature(generic_const_exprs)]
 pub mod delete_data_clause;
 pub mod delete_statement;
 mod graph_specifier;

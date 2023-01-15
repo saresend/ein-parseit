@@ -1,6 +1,6 @@
-use crate::triple_pattern::SPQLTriple;
-use crate::query_build::{QueryBuilder, QueryFragment}; 
 use crate::graph_specifier::GraphIdent;
+use crate::query_build::{QueryBuilder, QueryFragment};
+use crate::triple_pattern::SPQLTriple;
 use crate::where_clause::{WhereClause, WherePredicateSet};
 
 pub trait UpdateSelectionTrait {}
@@ -20,7 +20,6 @@ impl UpdateSelection {
         self.elems.push(el);
     }
 }
-
 
 impl QueryFragment for UpdateSelection {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {

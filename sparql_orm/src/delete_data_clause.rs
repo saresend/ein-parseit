@@ -1,10 +1,9 @@
 //!
-//! Delete Data Clause related implementation, which generates 
+//! Delete Data Clause related implementation, which generates
 //! Sparql `DELETE DATA` statements.
 //!
 //!
 
-#![feature(generic_const_exprs)]
 
 use crate::graph_specifier::{GraphIdent, GraphSpecifier};
 use crate::query_build::{QueryBuilder, QueryFragment};
@@ -41,19 +40,18 @@ where
 
 pub trait SPQLMutableSet {
     type NewContainer;
-    fn add_triple(&self, trip: impl SPQLConstTriple) -> Self::NewContainer;
+    fn add_triple(self, trip: impl SPQLConstTriple) -> Self::NewContainer;
 }
 
-const fn add_one(n: usize) -> usize {
-    n + 1 
-}
-
-impl<CT, const N: usize> SPQLMutableSet for [CT; N] where CT: SPQLConstTriple {
-    type NewContainer = [CT; N];
-    fn add_triple(&self, trip: impl SPQLConstTriple) -> Self::NewContainer {
+impl<CT, const N: usize> SPQLMutableSet for [CT; N]
+where
+    CT: SPQLConstTriple + Default,
+    [CT; N + 1]: Sized
+{
+    type NewContainer = [CT; N + 1];
+    fn add_triple(self, trip: impl SPQLConstTriple) -> Self::NewContainer where Self::NewContainer: Sized {
         todo!() 
     }
-
 }
 
 // Note: [T: N] already implements trait QueryFragment; no need to reimplement the trait here
@@ -65,34 +63,43 @@ pub struct DeleteDataBuilder {}
 
 #[doc(hidden)]
 pub struct DeleteDataBuilderGraph<G: GraphSpecifier> {
-    graph: G, 
+    graph: G,
 }
 
 #[doc(hidden)]
 pub struct DeleteDataBuilderComplete<G: GraphSpecifier, CT: DeletableTripleSet> {
-    graph: G, 
+    graph: G,
     elems: CT,
 }
 
 impl<G: GraphSpecifier> DeleteDataBuilderGraph<G> {
-    pub fn triple<CT: DeletableTripleSet + Default + SPQLMutableSet>(self, triple: impl SPQLConstTriple) -> DeleteDataBuilderComplete<G, CT> {
+    pub fn triple<CT: DeletableTripleSet + Default + SPQLMutableSet>(
+        self,
+        triple: impl SPQLConstTriple,
+    ) -> DeleteDataBuilderComplete<G, CT::NewContainer>
+    where
+        <CT as SPQLMutableSet>::NewContainer: DeletableTripleSet,
+    {
         let mut elems = CT::default();
-        let elems = <CT as SPQLMutableSet>::add_triple(elems, triple);
-        DeleteDataBuilderComplete { graph: self.graph, elems }
+        let elems = elems.add_triple(triple);
+        DeleteDataBuilderComplete {
+            graph: self.graph,
+            elems,
+        }
     }
 }
 
 impl<G: GraphSpecifier, CT: DeletableTripleSet> DeleteDataBuilderComplete<G, CT> {
-
     /// Consumes the builder to create a DeleteDataClause  
     pub fn build(self) -> DeleteDataClause<G, CT> {
-        DeleteDataClause { graph: self.graph, elems: self.elems } 
+        DeleteDataClause {
+            graph: self.graph,
+            elems: self.elems,
+        }
     }
 }
 
-
 impl DeleteDataBuilder {
-
     pub fn graph<G: GraphSpecifier>(graph: G) -> DeleteDataBuilderGraph<G> {
         DeleteDataBuilderGraph { graph }
     }
@@ -108,7 +115,7 @@ impl<const N: usize> DeleteDataStatement<N> {
 
     /// Returns a builder for a delete data statement
     pub fn builder() -> DeleteDataBuilder {
-        DeleteDataBuilder{}
+        DeleteDataBuilder {}
     }
 }
 #[cfg(test)]

@@ -4,7 +4,6 @@ fn main() {
     build_language("tree-sitter-rust")
 }
 
-
 fn build_language(language: &str) {
     let dir: PathBuf = ["vendor", language, "src"].iter().collect();
 

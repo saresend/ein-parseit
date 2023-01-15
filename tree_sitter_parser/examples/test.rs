@@ -1,4 +1,3 @@
-
 pub fn foo() {
     println!("in foo");
     bar()
@@ -11,5 +10,5 @@ fn bar() {
 }
 
 fn baz() {
-    println!("in baz"); 
+    println!("in baz");
 }
