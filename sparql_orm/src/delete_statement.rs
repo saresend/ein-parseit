@@ -29,6 +29,7 @@ where
         self.where_clause.generate_fragment(builder);
     }
 }
+
 pub type Delete = DeleteStatement<GraphIdent, UpdateSelection, UpdateWhereClause>;
 
 impl Delete {

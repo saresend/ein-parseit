@@ -13,6 +13,6 @@ pub mod insert_statement;
 mod predicates;
 pub mod query_build;
 mod sparql_var;
-mod triple_pattern;
+pub mod triple_pattern;
 mod update_types;
 mod where_clause;
