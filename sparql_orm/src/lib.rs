@@ -14,5 +14,6 @@ mod predicates;
 pub mod query_build;
 mod sparql_var;
 pub mod triple_pattern;
+pub mod prefix;
 mod update_types;
 mod where_clause;

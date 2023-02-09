@@ -3,7 +3,6 @@
 //! and types
 
 use crate::graph_specifier::{GraphIdent, GraphSpecifier};
-use crate::identifier::*;
 use crate::query_build::{QueryBuilder, QueryFragment, SparqlQuery};
 use crate::triple_pattern::SPQLConstTriple;
 
@@ -11,10 +10,12 @@ use crate::triple_pattern::SPQLConstTriple;
 /// a InsertDataClause. Not that this explicitly will not
 /// include variable binding triple patterns,
 /// as those are not supported by INSERT DATA
-///
-pub trait InsertableDataTripleSet {}
 
-impl<CT, const N: usize> InsertableDataTripleSet for [CT; N] where CT: SPQLConstTriple {}
+use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
+
+pub trait InsertableDataTripleSet<G: SPQLPrefixTrait> {}
+
+impl<CT, const N: usize, PRE: SPQLPrefixTrait> InsertableDataTripleSet<PRE> for [CT; N] where CT: SPQLConstTriple {}
 
 impl<CT, const N: usize> QueryFragment for [CT; N]
 where
@@ -28,25 +29,28 @@ where
     }
 }
 
-pub struct InsertDataClause<G: GraphSpecifier, SEL: InsertableDataTripleSet> {
+pub struct InsertDataClause<PRE: SPQLPrefixTrait, G: GraphSpecifier, SEL: InsertableDataTripleSet<PRE>> {
     graph_spec: G,
     selector: SEL,
+    prefix: PRE,
 }
 
 /// Implemented so that
 /// type system knows the output of this
 /// should be safe to invoke against a database
-impl<G, SEL> SparqlQuery for InsertDataClause<G, SEL>
+impl<PRE, G, SEL> SparqlQuery for InsertDataClause<PRE, G, SEL>
 where
+    PRE: SPQLPrefixTrait,
     G: GraphSpecifier + QueryFragment,
-    SEL: InsertableDataTripleSet + QueryFragment,
+    SEL: InsertableDataTripleSet<PRE> + QueryFragment,
 {
 }
 
-impl<G, SEL> QueryFragment for InsertDataClause<G, SEL>
+impl<G, SEL, PRE> QueryFragment for InsertDataClause<PRE, G, SEL>
 where
+    PRE: SPQLPrefixTrait,
     G: GraphSpecifier + QueryFragment,
-    SEL: InsertableDataTripleSet + QueryFragment,
+    SEL: InsertableDataTripleSet<PRE> + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
         builder.write_element("INSERT DATA { ");
@@ -59,15 +63,16 @@ where
 
 use crate::triple_pattern::ConstTriple;
 
-pub type InsertDataStatement<const N: usize> = InsertDataClause<GraphIdent, [ConstTriple; N]>;
+pub type InsertDataStatement<const N: usize> = InsertDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]>;
 
 use std::string::ToString;
 
-impl<const N: usize> InsertDataClause<GraphIdent, [ConstTriple; N]> {
+impl<const N: usize> InsertDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]> {
     pub fn new(graph_name: impl ToString, elems: [ConstTriple; N]) -> Self {
         Self {
             graph_spec: GraphIdent::new(graph_name),
             selector: elems,
+            prefix: NullPrefixSet {},
         }
     }
 }
