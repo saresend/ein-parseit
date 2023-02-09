@@ -14,7 +14,10 @@ pub trait SPQLPrefixTrait: QueryFragment {}
 pub struct NullPrefixSet {}
 
 
-pub struct Prefix(uri::Uri);
+pub struct Prefix {
+    name: String,
+    uri: uri::Uri,
+}
 
 impl SPQLPrefixTrait for NullPrefixSet {}
 
@@ -26,7 +29,9 @@ impl QueryFragment for NullPrefixSet {
 
 impl QueryFragment for Prefix {
    fn generate_fragment(&self, builder: &mut crate::query_build::QueryBuilder) {
-       let uri_str = self.0.to_string();
+       let uri_str = self.uri.to_string();
+       builder.write_element("PREFIX ");
+       builder.write_element(&std::format!("{}: ", &self.name));
        builder.write_element(&std::format!("<{}>", &uri_str));
    } 
 }
@@ -38,8 +43,12 @@ mod tests {
     use crate::query_build::gen_fragment;
     #[test]
     fn test_basic_prefix_generation() {
-        let test_prefix = Prefix(uri::Uri::try_from("http://purl.org/dc/elements/1.1").unwrap());        
+
+        let test_prefix = Prefix { 
+            name: "dc".to_string(),
+             uri: uri::Uri::try_from("http://purl.org/dc/elements/1.1").unwrap()
+        };
         let output = gen_fragment(test_prefix);
-        assert_eq!("<http://purl.org/dc/elements/1.1>", output);
+        assert_eq!("PREFIX dc: <http://purl.org/dc/elements/1.1>", output);
     }
 }
