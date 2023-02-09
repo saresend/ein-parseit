@@ -789,6 +789,7 @@ dependencies = [
 name = "sparql_orm"
 version = "0.1.0"
 dependencies = [
+ "http",
  "reqwest",
 ]
 
