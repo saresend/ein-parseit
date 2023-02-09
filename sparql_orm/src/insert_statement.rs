@@ -2,6 +2,7 @@ use crate::graph_specifier::{GraphIdent, GraphSpecifier};
 use crate::query_build::{QueryBuilder, QueryFragment};
 use crate::update_types::{UpdateSelection, UpdateSelectionTrait, UpdateWhereClause};
 use crate::where_clause::{WhereClauseTrait, WherePredicateSet};
+use crate::prefix::{SPQLPrefixTrait, NullPrefixSet};
 
 ///
 /// A marker trait for types which
@@ -9,22 +10,25 @@ use crate::where_clause::{WhereClauseTrait, WherePredicateSet};
 ///
 pub trait InsertStatementTrait {}
 
-pub struct InsertStatement<G: GraphSpecifier, SEL: UpdateSelectionTrait, WHERE: WhereClauseTrait> {
+pub struct InsertStatement<PRE: SPQLPrefixTrait, G: GraphSpecifier, SEL: UpdateSelectionTrait, WHERE: WhereClauseTrait> {
+    prefix: PRE,
     graph: G,
     selection: SEL,
     where_clause: WHERE,
 }
 
-impl<G, SEL, WHERE> InsertStatementTrait for InsertStatement<G, SEL, WHERE>
+impl<PRE, G, SEL, WHERE> InsertStatementTrait for InsertStatement<PRE, G, SEL, WHERE>
 where
+    PRE: SPQLPrefixTrait,
     G: GraphSpecifier,
     SEL: UpdateSelectionTrait,
     WHERE: WhereClauseTrait,
 {
 }
 
-impl<G, SEL, WHERE> QueryFragment for InsertStatement<G, SEL, WHERE>
+impl<PRE, G, SEL, WHERE> QueryFragment for InsertStatement<PRE, G, SEL, WHERE>
 where
+    PRE: SPQLPrefixTrait,
     G: QueryFragment + GraphSpecifier,
     SEL: QueryFragment + UpdateSelectionTrait,
     WHERE: QueryFragment + WhereClauseTrait,
@@ -39,7 +43,7 @@ where
     }
 }
 
-pub type Insert = InsertStatement<GraphIdent, UpdateSelection, UpdateWhereClause>;
+pub type Insert = InsertStatement<NullPrefixSet, GraphIdent, UpdateSelection, UpdateWhereClause>;
 
 impl UpdateWhereClause {
     pub fn new(graph: impl std::string::ToString, predicates: WherePredicateSet) -> Self {
@@ -57,6 +61,7 @@ impl Insert {
         where_clause: UpdateWhereClause,
     ) -> Self {
         Self {
+            prefix: NullPrefixSet {  },
             graph: GraphIdent::new(graph),
             selection,
             where_clause,
