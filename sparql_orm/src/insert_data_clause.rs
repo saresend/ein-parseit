@@ -10,12 +10,14 @@ use crate::triple_pattern::SPQLConstTriple;
 /// a InsertDataClause. Not that this explicitly will not
 /// include variable binding triple patterns,
 /// as those are not supported by INSERT DATA
-
 use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
 
 pub trait InsertableDataTripleSet<G: SPQLPrefixTrait> {}
 
-impl<CT, const N: usize, PRE: SPQLPrefixTrait> InsertableDataTripleSet<PRE> for [CT; N] where CT: SPQLConstTriple {}
+impl<CT, const N: usize, PRE: SPQLPrefixTrait> InsertableDataTripleSet<PRE> for [CT; N] where
+    CT: SPQLConstTriple
+{
+}
 
 impl<CT, const N: usize> QueryFragment for [CT; N]
 where
@@ -29,7 +31,11 @@ where
     }
 }
 
-pub struct InsertDataClause<PRE: SPQLPrefixTrait, G: GraphSpecifier, SEL: InsertableDataTripleSet<PRE>> {
+pub struct InsertDataClause<
+    PRE: SPQLPrefixTrait,
+    G: GraphSpecifier,
+    SEL: InsertableDataTripleSet<PRE>,
+> {
     graph_spec: G,
     selector: SEL,
     prefix: PRE,
@@ -64,7 +70,8 @@ where
 
 use crate::triple_pattern::ConstTriple;
 
-pub type InsertDataStatement<const N: usize> = InsertDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]>;
+pub type InsertDataStatement<const N: usize> =
+    InsertDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]>;
 
 use std::string::ToString;
 

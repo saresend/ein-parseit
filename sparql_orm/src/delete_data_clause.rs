@@ -4,11 +4,10 @@
 //!
 //!
 
-
 use crate::graph_specifier::{GraphIdent, GraphSpecifier};
+use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
 use crate::query_build::{QueryBuilder, QueryFragment};
 use crate::triple_pattern::{ConstTriple, SPQLConstTriple};
-use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
 
 /// A marker trait for collections which
 /// can be evaluate as part of a Delete Data statement
@@ -24,12 +23,11 @@ pub struct DeleteDataClause<PRE: SPQLPrefixTrait, G: GraphSpecifier, CT: Deletab
     prefix: PRE,
     graph: G,
     elems: CT,
-
 }
 
 impl<PRE, G, CT> QueryFragment for DeleteDataClause<PRE, G, CT>
 where
-    PRE: SPQLPrefixTrait, 
+    PRE: SPQLPrefixTrait,
     CT: QueryFragment + DeletableTripleSet,
     G: GraphSpecifier + QueryFragment,
 {
@@ -51,16 +49,20 @@ pub trait SPQLMutableSet {
 impl<CT, const N: usize> SPQLMutableSet for [CT; N]
 where
     CT: SPQLConstTriple + Default,
-    [CT; N + 1]: Sized
+    [CT; N + 1]: Sized,
 {
     type NewContainer = [CT; N + 1];
-    fn add_triple(self, trip: impl SPQLConstTriple) -> Self::NewContainer where Self::NewContainer: Sized {
-        todo!() 
+    fn add_triple(self, trip: impl SPQLConstTriple) -> Self::NewContainer
+    where
+        Self::NewContainer: Sized,
+    {
+        todo!()
     }
 }
 
 // Note: [T: N] already implements trait QueryFragment; no need to reimplement the trait here
-pub type DeleteDataStatement<const N: usize> = DeleteDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]>;
+pub type DeleteDataStatement<const N: usize> =
+    DeleteDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]>;
 
 use std::string::ToString;
 

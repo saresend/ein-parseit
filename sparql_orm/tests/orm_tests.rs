@@ -23,15 +23,16 @@ fn write_to_sparql_db<T: SparqlQuery + QueryFragment>(val: T) -> reqwest::Result
 
 #[test]
 fn test_basic_insert_data() {
-   let graph_name = "test_graph1";
+    let graph_name = "test_graph1";
 
-   let elems = [
-     ConstTriple::new("pancakes", "topping", "butter"),
-     ConstTriple::new("pancakes", "topping", "jam"),
-     ConstTriple::new("pancakes", "topping", "syrup"),
-   ];
-   let data_to_insert = sparql_orm::insert_data_clause::InsertDataStatement::new(graph_name, elems);
+    let elems = [
+        ConstTriple::new("pancakes", "topping", "butter"),
+        ConstTriple::new("pancakes", "topping", "jam"),
+        ConstTriple::new("pancakes", "topping", "syrup"),
+    ];
+    let data_to_insert =
+        sparql_orm::insert_data_clause::InsertDataStatement::new(graph_name, elems);
 
-   let result = write_to_sparql_db(data_to_insert); 
-   assert!(result.is_ok());
+    let result = write_to_sparql_db(data_to_insert);
+    assert!(result.is_ok());
 }

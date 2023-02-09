@@ -1,8 +1,8 @@
 use crate::graph_specifier::{GraphIdent, GraphSpecifier};
+use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
 use crate::query_build::{QueryBuilder, QueryFragment};
 use crate::update_types::{UpdateSelection, UpdateSelectionTrait, UpdateWhereClause};
 use crate::where_clause::{WhereClauseTrait, WherePredicateSet};
-use crate::prefix::{SPQLPrefixTrait, NullPrefixSet};
 
 ///
 /// A marker trait for types which
@@ -10,7 +10,12 @@ use crate::prefix::{SPQLPrefixTrait, NullPrefixSet};
 ///
 pub trait InsertStatementTrait {}
 
-pub struct InsertStatement<PRE: SPQLPrefixTrait, G: GraphSpecifier, SEL: UpdateSelectionTrait, WHERE: WhereClauseTrait> {
+pub struct InsertStatement<
+    PRE: SPQLPrefixTrait,
+    G: GraphSpecifier,
+    SEL: UpdateSelectionTrait,
+    WHERE: WhereClauseTrait,
+> {
     prefix: PRE,
     graph: G,
     selection: SEL,
@@ -61,7 +66,7 @@ impl Insert {
         where_clause: UpdateWhereClause,
     ) -> Self {
         Self {
-            prefix: NullPrefixSet {  },
+            prefix: NullPrefixSet {},
             graph: GraphIdent::new(graph),
             selection,
             where_clause,
