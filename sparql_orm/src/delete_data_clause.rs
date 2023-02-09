@@ -34,6 +34,7 @@ where
     G: GraphSpecifier + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
+        self.prefix.generate_fragment(builder);
         builder.write_element("DELETE DATA { ");
         self.graph.generate_fragment(builder);
         builder.write_element(" {\n");

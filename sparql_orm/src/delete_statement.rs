@@ -2,20 +2,23 @@ use crate::graph_specifier::{GraphIdent, GraphSpecifier};
 use crate::query_build::{QueryBuilder, QueryFragment};
 use crate::update_types::{UpdateSelection, UpdateSelectionTrait, UpdateWhereClause};
 use crate::where_clause::WhereClauseTrait;
+use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
 
 ///
 /// A trait marker for types that represent a full `DELETE` statement
 ///
 pub trait DeleteStatementTrait {}
 
-pub struct DeleteStatement<G: GraphSpecifier, SEL: UpdateSelectionTrait, WHERE: WhereClauseTrait> {
+pub struct DeleteStatement<PRE: SPQLPrefixTrait, G: GraphSpecifier, SEL: UpdateSelectionTrait, WHERE: WhereClauseTrait> {
+    prefix: PRE, 
     graph: G,
     selection: SEL,
     where_clause: WHERE,
 }
 
-impl<G, SEL, WHERE> QueryFragment for DeleteStatement<G, SEL, WHERE>
+impl<PRE, G, SEL, WHERE> QueryFragment for DeleteStatement<PRE, G, SEL, WHERE>
 where
+    PRE: SPQLPrefixTrait,
     G: GraphSpecifier + QueryFragment,
     SEL: UpdateSelectionTrait + QueryFragment,
     WHERE: QueryFragment + WhereClauseTrait,
@@ -30,7 +33,7 @@ where
     }
 }
 
-pub type Delete = DeleteStatement<GraphIdent, UpdateSelection, UpdateWhereClause>;
+pub type Delete = DeleteStatement<NullPrefixSet, GraphIdent, UpdateSelection, UpdateWhereClause>;
 
 impl Delete {
     pub fn new(
@@ -39,6 +42,7 @@ impl Delete {
         where_clause: UpdateWhereClause,
     ) -> Self {
         Self {
+            prefix: NullPrefixSet {  },
             graph: GraphIdent::new(graph),
             selection,
             where_clause,

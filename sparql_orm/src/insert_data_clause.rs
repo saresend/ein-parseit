@@ -53,6 +53,7 @@ where
     SEL: InsertableDataTripleSet<PRE> + QueryFragment,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
+        self.prefix.generate_fragment(builder);
         builder.write_element("INSERT DATA { ");
         self.graph_spec.generate_fragment(builder);
         builder.write_element(" {\n");
