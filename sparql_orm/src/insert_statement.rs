@@ -39,6 +39,7 @@ where
     WHERE: QueryFragment + WhereClauseTrait,
 {
     fn generate_fragment(&self, builder: &mut QueryBuilder) {
+        self.prefix.generate_fragment(builder);
         builder.write_element("INSERT {\n");
         self.graph.generate_fragment(builder);
         builder.write_element(" {\n");
