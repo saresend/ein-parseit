@@ -8,6 +8,7 @@
 use crate::graph_specifier::{GraphIdent, GraphSpecifier};
 use crate::query_build::{QueryBuilder, QueryFragment};
 use crate::triple_pattern::{ConstTriple, SPQLConstTriple};
+use crate::prefix::{NullPrefixSet, SPQLPrefixTrait};
 
 /// A marker trait for collections which
 /// can be evaluate as part of a Delete Data statement
@@ -19,13 +20,16 @@ impl<CT, const N: usize> DeletableTripleSet for [CT; N] where CT: SPQLConstTripl
 /// The main structure that holds
 /// all of the elements to be deleted
 ///
-pub struct DeleteDataClause<G: GraphSpecifier, CT: DeletableTripleSet> {
+pub struct DeleteDataClause<PRE: SPQLPrefixTrait, G: GraphSpecifier, CT: DeletableTripleSet> {
+    prefix: PRE,
     graph: G,
     elems: CT,
+
 }
 
-impl<G, CT> QueryFragment for DeleteDataClause<G, CT>
+impl<PRE, G, CT> QueryFragment for DeleteDataClause<PRE, G, CT>
 where
+    PRE: SPQLPrefixTrait, 
     CT: QueryFragment + DeletableTripleSet,
     G: GraphSpecifier + QueryFragment,
 {
@@ -55,67 +59,17 @@ where
 }
 
 // Note: [T: N] already implements trait QueryFragment; no need to reimplement the trait here
-pub type DeleteDataStatement<const N: usize> = DeleteDataClause<GraphIdent, [ConstTriple; N]>;
+pub type DeleteDataStatement<const N: usize> = DeleteDataClause<NullPrefixSet, GraphIdent, [ConstTriple; N]>;
 
 use std::string::ToString;
-
-pub struct DeleteDataBuilder {}
-
-#[doc(hidden)]
-pub struct DeleteDataBuilderGraph<G: GraphSpecifier> {
-    graph: G,
-}
-
-#[doc(hidden)]
-pub struct DeleteDataBuilderComplete<G: GraphSpecifier, CT: DeletableTripleSet> {
-    graph: G,
-    elems: CT,
-}
-
-impl<G: GraphSpecifier> DeleteDataBuilderGraph<G> {
-    pub fn triple<CT: DeletableTripleSet + Default + SPQLMutableSet>(
-        self,
-        triple: impl SPQLConstTriple,
-    ) -> DeleteDataBuilderComplete<G, CT::NewContainer>
-    where
-        <CT as SPQLMutableSet>::NewContainer: DeletableTripleSet,
-    {
-        let mut elems = CT::default();
-        let elems = elems.add_triple(triple);
-        DeleteDataBuilderComplete {
-            graph: self.graph,
-            elems,
-        }
-    }
-}
-
-impl<G: GraphSpecifier, CT: DeletableTripleSet> DeleteDataBuilderComplete<G, CT> {
-    /// Consumes the builder to create a DeleteDataClause  
-    pub fn build(self) -> DeleteDataClause<G, CT> {
-        DeleteDataClause {
-            graph: self.graph,
-            elems: self.elems,
-        }
-    }
-}
-
-impl DeleteDataBuilder {
-    pub fn graph<G: GraphSpecifier>(graph: G) -> DeleteDataBuilderGraph<G> {
-        DeleteDataBuilderGraph { graph }
-    }
-}
 
 impl<const N: usize> DeleteDataStatement<N> {
     pub fn new(graph_name: impl ToString, elems: [ConstTriple; N]) -> Self {
         Self {
+            prefix: NullPrefixSet {},
             graph: GraphIdent::new(graph_name),
             elems,
         }
-    }
-
-    /// Returns a builder for a delete data statement
-    pub fn builder() -> DeleteDataBuilder {
-        DeleteDataBuilder {}
     }
 }
 #[cfg(test)]
